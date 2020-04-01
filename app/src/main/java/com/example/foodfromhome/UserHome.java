@@ -83,9 +83,9 @@ public class UserHome extends AppCompatActivity {
             sampleTextView = findViewById(R.id.recipeText);
             sampleTextView.setText(meal.getRecipe());
             sampleTextView = findViewById(R.id.locationText);
-            sampleTextView.setText(meal.getCommunity());
+            sampleTextView.setText(meal.getToLocation());
             sampleTextView = findViewById(R.id.costText);
-            sampleTextView.setText("-");
+            sampleTextView.setText(String.valueOf(meal.getCost()));
         }
         else {
             findViewById(R.id.newTask).setEnabled(true);

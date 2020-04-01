@@ -1,6 +1,9 @@
 package com.example.foodfromhome;
 
 import android.content.Intent;
+import android.location.Location;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.List;
@@ -21,6 +25,8 @@ public class UserTask extends AppCompatActivity {
     Meal selectedMeal;
     String userEmail;
     String taskType;
+
+    TextView bufferText = findViewById(R.id.bufferText);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +158,7 @@ public class UserTask extends AppCompatActivity {
         }
         else if(taskType.equals("deliver")) {
             db.deleteMeal(selectedMeal);
-            Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getCommunity(), selectedMeal.getPacket(), selectedMeal.getUploader(), userEmail, selectedMeal.getReceiver(), selectedMeal.getOTP());
+            Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), selectedMeal.getToLocation(), selectedMeal.getPacket(), selectedMeal.getUploader(), userEmail, selectedMeal.getReceiver(), selectedMeal.getOTP(), selectedMeal.getFrequency(), 0);
             db.addMeal(meal);
             intent.putExtras(bundle);
             startActivity(intent);
@@ -161,7 +167,17 @@ public class UserTask extends AppCompatActivity {
             // generate otp and send to user. Also update otp in database
             int otp = ThreadLocalRandom.current().nextInt(10000, 99999 + 1);
             db.deleteMeal(selectedMeal);
-            Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getCommunity(), selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp);
+            Switch aSwitch = findViewById(R.id.regularSwitch);
+            boolean checked = aSwitch.isChecked();
+            String frequency;
+            if(checked)
+                frequency = "Regular";
+            else
+                frequency = "Demand";
+            String toLocation = db.getUser(userEmail).getCommunity();
+            Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), toLocation, selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp, frequency, 0);
+            float cost = getCost(meal);
+            meal.setCost(cost);
             db.addMeal(meal);
             // send delivery information email to user
             intent.putExtras(bundle);
@@ -178,5 +194,64 @@ public class UserTask extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    public float getCost(Meal meal) {
+        String toLocation = meal.getToLocation();
+        String fromLocation = meal.getFromLocation();
+
+        TextView textView = findViewById(R.id.bufferText);
+
+        GeocodingLocation toLocationAddress = new GeocodingLocation();
+        GeocodingLocation fromLocationAddress = new GeocodingLocation();
+        toLocationAddress.getAddressFromLocation(toLocation,
+                getApplicationContext(), new GeocoderHandler());
+        toLocation = bufferText.getText().toString();
+        fromLocationAddress.getAddressFromLocation(fromLocation,
+                getApplicationContext(), new GeocoderHandler());
+        fromLocation = bufferText.getText().toString();
+
+        Location toLoc = new Location("Receiver");
+        toLoc.setLatitude(Double.parseDouble(toLocation.split(":")[0]));
+        toLoc.setLongitude(Double.parseDouble(toLocation.split(":")[1]));
+
+        Location fromLoc = new Location("Provider");
+        fromLoc.setLatitude(Double.parseDouble(fromLocation.split(":")[0]));
+        fromLoc.setLongitude(Double.parseDouble(fromLocation.split(":")[1]));
+
+        float distance = fromLoc.distanceTo(toLoc);
+
+        float cost = 0;
+
+        cost += distance;
+
+        if(meal.getPacket().equals("Small"))
+            cost += 1;
+        else if(meal.getPacket().equals("Medium"))
+            cost += 2;
+        else
+            cost += 3;
+
+        if(meal.getFrequency().equals("Regular"))
+            cost -= 0.2*cost;
+
+        return cost;
+    }
+
+    private class GeocoderHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message message) {
+            String locationAddress;
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    locationAddress = bundle.getString("address");
+                    break;
+                default:
+                    locationAddress = null;
+            }
+            bufferText.setText(locationAddress);
+        }
     }
 }

@@ -26,14 +26,17 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_MEALS = "MealData";
     private static final String KEY_ID_MEALS = "id";
     private static final String KEY_RECIPE_MEALS = "recipe";
-    private static final String KEY_COMMUNITY_MEALS = "community";
+    private static final String KEY_FROM_MEALS = "fromLoc";
+    private static final String KEY_TO_MEALS = "toLoc";
     private static final String KEY_PACKET_MEALS = "packet";
     private static final String KEY_UPLOADER_MEALS = "uploader";
     private static final String KEY_DELIVERY_MEALS = "delivery";
     private static final String KEY_RECEIVER_MEALS = "receiver";
     private static final String KEY_OTP = "otp";
-    private static final String[] COLUMNS_MEALS = { KEY_ID_MEALS, KEY_RECIPE_MEALS, KEY_COMMUNITY_MEALS, KEY_PACKET_MEALS,
-            KEY_UPLOADER_MEALS, KEY_DELIVERY_MEALS, KEY_RECEIVER_MEALS, KEY_OTP };
+    private static final String KEY_FREQUENCY = "frequency";
+    private static final String KEY_COST = "cost";
+    private static final String[] COLUMNS_MEALS = { KEY_ID_MEALS, KEY_RECIPE_MEALS, KEY_FROM_MEALS, KEY_TO_MEALS, KEY_PACKET_MEALS,
+            KEY_UPLOADER_MEALS, KEY_DELIVERY_MEALS, KEY_RECEIVER_MEALS, KEY_OTP, KEY_FREQUENCY, KEY_COST };
 
     public SQLiteDatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,9 +51,9 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
         String CREATION_TABLE_MEALS = "CREATE TABLE  MealData( "
                 + "id TEXT PRIMARY KEY, " + "recipe TEXT, "
-                + "community TEXT, " + "packet TEXT, "
+                + "fromLoc TEXT, " + "toLoc TEXT, " + "packet TEXT, "
                 + "uploader TEXT, "
-                + "delivery TEXT, " + "receiver TEXT, " + "otp INTEGER )";
+                + "delivery TEXT, " + "receiver TEXT, " + "otp INTEGER, " + "frequency TEXT, " + "cost TEXT )";
 
         db.execSQL(CREATION_TABLE_USERS);
         db.execSQL(CREATION_TABLE_MEALS);
@@ -174,12 +177,15 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         Meal meal = new Meal();
         meal.setId(cursor.getString(0));
         meal.setRecipe(cursor.getString(1));
-        meal.setCommunity(cursor.getString(2));
-        meal.setPacket(cursor.getString(3));
-        meal.setUploader(cursor.getString(4));
-        meal.setDelivery(cursor.getString(5));
-        meal.setReceiver(cursor.getString(6));
-        meal.setOTP(Integer.parseInt(cursor.getString(7)));
+        meal.setFromLocation(cursor.getString(2));
+        meal.setToLocation(cursor.getString(3));
+        meal.setPacket(cursor.getString(4));
+        meal.setUploader(cursor.getString(5));
+        meal.setDelivery(cursor.getString(6));
+        meal.setReceiver(cursor.getString(7));
+        meal.setOTP(Integer.parseInt(cursor.getString(8)));
+        meal.setFrequency(cursor.getString(9));
+        meal.setCost(Float.parseFloat(cursor.getString(10)));
 
         return meal;
     }
@@ -197,12 +203,15 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
                 meal = new Meal();
                 meal.setId(cursor.getString(0));
                 meal.setRecipe(cursor.getString(1));
-                meal.setCommunity(cursor.getString(2));
-                meal.setPacket(cursor.getString(3));
-                meal.setUploader(cursor.getString(4));
-                meal.setDelivery(cursor.getString(5));
-                meal.setReceiver(cursor.getString(6));
-                meal.setOTP(Integer.parseInt(cursor.getString(7)));
+                meal.setFromLocation(cursor.getString(2));
+                meal.setToLocation(cursor.getString(3));
+                meal.setPacket(cursor.getString(4));
+                meal.setUploader(cursor.getString(5));
+                meal.setDelivery(cursor.getString(6));
+                meal.setReceiver(cursor.getString(7));
+                meal.setOTP(Integer.parseInt(cursor.getString(8)));
+                meal.setFrequency(cursor.getString(9));
+                meal.setCost(Float.parseFloat(cursor.getString(10)));
                 meals.add(meal);
             } while (cursor.moveToNext());
         }
@@ -215,12 +224,15 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ID_MEALS, meal.getId());
         values.put(KEY_RECIPE_MEALS, meal.getRecipe());
-        values.put(KEY_COMMUNITY_MEALS, meal.getCommunity());
+        values.put(KEY_FROM_MEALS, meal.getFromLocation());
+        values.put(KEY_TO_MEALS, meal.getToLocation());
         values.put(KEY_PACKET_MEALS, meal.getPacket());
         values.put(KEY_UPLOADER_MEALS, meal.getUploader());
         values.put(KEY_DELIVERY_MEALS, meal.getDelivery());
         values.put(KEY_RECEIVER_MEALS, meal.getReceiver());
         values.put(KEY_OTP, meal.getOTP());
+        values.put(KEY_FREQUENCY, meal.getFrequency());
+        values.put(KEY_COST, meal.getCost());
         // insert
         db.insert(TABLE_MEALS,null, values);
         db.close();
@@ -231,12 +243,15 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ID_MEALS, meal.getId());
         values.put(KEY_RECIPE_MEALS, meal.getRecipe());
-        values.put(KEY_COMMUNITY_MEALS, meal.getCommunity());
+        values.put(KEY_FROM_MEALS, meal.getFromLocation());
+        values.put(KEY_TO_MEALS, meal.getToLocation());
         values.put(KEY_PACKET_MEALS, meal.getPacket());
         values.put(KEY_UPLOADER_MEALS, meal.getUploader());
         values.put(KEY_DELIVERY_MEALS, meal.getDelivery());
         values.put(KEY_RECEIVER_MEALS, meal.getReceiver());
         values.put(KEY_OTP, meal.getOTP());
+        values.put(KEY_FREQUENCY, meal.getFrequency());
+        values.put(KEY_COST, meal.getCost());
 
         int i = db.update(TABLE_MEALS, // table
                 values, // column/value
@@ -247,6 +262,5 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
         return i;
     }
-
 }
 

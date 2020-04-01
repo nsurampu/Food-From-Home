@@ -39,6 +39,6 @@
     <string name="eta">ETA:</string>
     <string name="otp">OTP:</string>
     <string name="cost">Cost:</string>
-    <string name="regular">Regular Delivery (Once enabled, can be disabled only after next meal)</string>
+    <string name="regular">Regular Delivery</string>
     <string name="finish">Finish</string>
 </resources>
