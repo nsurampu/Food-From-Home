@@ -26,10 +26,11 @@ public class UserTask extends AppCompatActivity {
     String userEmail;
     String taskType;
 
-    TextView bufferText = findViewById(R.id.bufferText);
+    String buffer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        buffer = null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_task);
         db = new SQLiteDatabaseHandler(this);
@@ -166,7 +167,7 @@ public class UserTask extends AppCompatActivity {
         else if(taskType.equals("get")){
             // generate otp and send to user. Also update otp in database
             int otp = ThreadLocalRandom.current().nextInt(10000, 99999 + 1);
-            db.deleteMeal(selectedMeal);
+            // db.deleteMeal(selectedMeal);
             Switch aSwitch = findViewById(R.id.regularSwitch);
             boolean checked = aSwitch.isChecked();
             String frequency;
@@ -175,10 +176,11 @@ public class UserTask extends AppCompatActivity {
             else
                 frequency = "Demand";
             String toLocation = db.getUser(userEmail).getCommunity();
+            System.out.println(selectedMeal.getFromLocation() + " - " + toLocation);
             Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), toLocation, selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp, frequency, 0);
             float cost = getCost(meal);
             meal.setCost(cost);
-            db.addMeal(meal);
+            db.updateMeal(meal);
             // send delivery information email to user
             intent.putExtras(bundle);
             startActivity(intent);
@@ -200,17 +202,16 @@ public class UserTask extends AppCompatActivity {
         String toLocation = meal.getToLocation();
         String fromLocation = meal.getFromLocation();
 
-        TextView textView = findViewById(R.id.bufferText);
-
         GeocodingLocation toLocationAddress = new GeocodingLocation();
         GeocodingLocation fromLocationAddress = new GeocodingLocation();
         toLocationAddress.getAddressFromLocation(toLocation,
                 getApplicationContext(), new GeocoderHandler());
-        toLocation = bufferText.getText().toString();
+        System.out.println(buffer);
+        toLocation = buffer;
         fromLocationAddress.getAddressFromLocation(fromLocation,
                 getApplicationContext(), new GeocoderHandler());
-        fromLocation = bufferText.getText().toString();
-
+        fromLocation = buffer;
+        System.out.println(buffer);
         Location toLoc = new Location("Receiver");
         toLoc.setLatitude(Double.parseDouble(toLocation.split(":")[0]));
         toLoc.setLongitude(Double.parseDouble(toLocation.split(":")[1]));
@@ -242,16 +243,15 @@ public class UserTask extends AppCompatActivity {
 
         @Override
         public void handleMessage(Message message) {
-            String locationAddress;
-            switch (message.what) {
+            String locationAddress = null;
+            switch(message.what) {
                 case 1:
                     Bundle bundle = message.getData();
                     locationAddress = bundle.getString("address");
+                    System.out.println(locationAddress);
                     break;
-                default:
-                    locationAddress = null;
             }
-            bufferText.setText(locationAddress);
+            buffer = locationAddress;
         }
     }
 }
