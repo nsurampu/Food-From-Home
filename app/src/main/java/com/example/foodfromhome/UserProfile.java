@@ -15,6 +15,17 @@ public class UserProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
         db = new SQLiteDatabaseHandler(this);
+        Bundle bundle = getIntent().getExtras();
+        if(bundle.getString("page")==null) {
+            String email = bundle.getString("email");
+            EditText editText;
+            editText = findViewById(R.id.nameRegister);
+            editText.setText(db.getUser(email).getName());
+            editText = findViewById(R.id.phoneRegister);
+            editText.setText(db.getUser(email).getMobile());
+            editText = findViewById(R.id.communityRegister);
+            editText.setText(db.getUser(email).getCommunity());
+        }
     }
 
     // Called when user finishes profile

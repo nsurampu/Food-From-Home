@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
             else if (pass.equals(db.getUser(email).getPassword())) {
                 Bundle bundle = new Bundle();
                 bundle.putString("email", email);
+                bundle.putString("page", "login");
                 intent.putExtras(bundle);
                 System.out.println(pass.equals(db.getUser(email).getPassword()));
                 editorEmail.putString("email", email);
