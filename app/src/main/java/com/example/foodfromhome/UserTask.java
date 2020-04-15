@@ -1,7 +1,10 @@
 package com.example.foodfromhome;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.Snackbar;
@@ -10,18 +13,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
-import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class UserTask extends AppCompatActivity {
 
     private SQLiteDatabaseHandler db;
-    String[] itemsNames;
+    List<String> itemsNames;
     Meal selectedMeal;
     String userEmail;
     String taskType;
@@ -30,34 +32,38 @@ public class UserTask extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        itemsNames = new ArrayList<>();
         buffer = null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_task);
         db = new SQLiteDatabaseHandler(this);
         selectedMeal = null;
         taskType = null;
-        itemsNames = new String[1];
         Bundle bundle = getIntent().getExtras();
         userEmail = bundle.getString("email");
-//        itemsNames[0] = "Select an option to see the respective lists";
+
+        itemsNames.add("Choose an option to either get or deliver a meal");
+
+        ListView list = findViewById(R.id.availableMeals);
+        list.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, itemsNames));
+    }
+
+    public void getMeals(View view) {
+        findViewById(R.id.regularDelivery).setVisibility(View.VISIBLE);
+        itemsNames = new ArrayList<>();
         List<Meal> meals = db.allMeals();
-        itemsNames = new String[0];
-        boolean counter = true;
-
-        if (meals != null) {
-            itemsNames = new String[meals.size()];
-
+        boolean counter = true;if (meals != null) {
             for (int i = 0; i < meals.size(); i++) {
-                if (!meals.get(i).getUploader().equals(userEmail)) {
-                    itemsNames[i] = meals.get(i).toString();
+                if (!meals.get(i).getUploader().equals(userEmail) && !meals.get(i).getDelivery().equals("None Assigned") && meals.get(i).getOTP()==-1) {
                     System.out.println(meals.get(i).toString());
+                    itemsNames.add(meals.get(i).toString());
                     counter = false;
                 }
             }
         }
         if(counter) {
-            itemsNames = new String[1];
-            itemsNames[0] = "No Tasks available at this time. Check back later";
+            itemsNames.add("No Tasks available at this time. Check back later");
         }
 
         ListView list = findViewById(R.id.availableMeals);
@@ -69,20 +75,20 @@ public class UserTask extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                String[] str = itemsNames[position].split("\n");
+                String[] str = itemsNames.get(position).split("\n");
                 String mealID = str[0].split(": ")[1];
                 selectedMeal = db.getMeal(mealID);
                 String prompt = null;
                 if(selectedMeal.getOTP()!=-1) {
-                    prompt = "Already assigned for delivery. Please try ordering a different meal";
+                    prompt = itemsNames.get(position);
                     taskType = "invalid";
                 }
                 else if(!selectedMeal.getDelivery().equals("None Assigned") && selectedMeal.getOTP()==-1) {
-                    prompt = "You can ORDER this meal. Create task to get meal delivered";
+                    prompt = itemsNames.get(position);
                     taskType = "get";
                 }
                 else if(selectedMeal.getDelivery().equals("None Assigned")) {
-                    prompt = "You can DELIVER this meal. Create task to deliver meal";
+                    prompt = itemsNames.get(position);
                     taskType = "deliver";
                 }
 
@@ -92,61 +98,105 @@ public class UserTask extends AppCompatActivity {
         });
     }
 
-//    public void getDeliveries(View view) {
-//        List<Meal> meals = db.allMeals();
-//
-//        itemsNames = new String[0];
-//        boolean counter = true;
-//
-//        if (meals != null) {
-//            itemsNames = new String[meals.size()];
-//
-//            for (int i = 0; i < meals.size(); i++) {
-//                if (meals.get(i).getDelivery().equals("None Assigned") && !meals.get(i).getUploader().equals(userEmail)) {
-//                    itemsNames[i] = meals.get(i).toString();
-//                    System.out.println(meals.get(i).toString());
-//                    counter = false;
-//                }
-//            }
-//        }
-//
-//        if(counter) {
-//            itemsNames = new String[1];
-//            itemsNames[0] = "No Deliveries available at this time. Check back later";
-//        }
-//
-//        ListView list = findViewById(R.id.availableMeals);
-//        list.setAdapter(new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1, android.R.id.text1, itemsNames));
-//    }
-//
-//    public void getMeals(View view) {
-//        List<Meal> meals = db.allMeals();
-//
-//        itemsNames = new String[0];
-//        boolean counter = true;
-//
-//        if (meals != null) {
-//            itemsNames = new String[meals.size()];
-//
-//            for (int i = 0; i < meals.size(); i++) {
-//                if(!meals.get(i).getUploader().equals(userEmail)) {
-//                    itemsNames[i] = meals.get(i).toString();
-//                    System.out.println(meals.get(i).toString());
-//                    counter = false;
-//                }
-//            }
-//        }
-//
-//        if(counter) {
-//            itemsNames = new String[1];
-//            itemsNames[0] = "No Meals available at this time. Check back later";
-//        }
-//
-//        ListView list = findViewById(R.id.availableMeals);
-//        list.setAdapter(new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1, android.R.id.text1, itemsNames));
-//    }
+    public void getDeliveries(View view) {
+        findViewById(R.id.regularDelivery).setVisibility(View.INVISIBLE);
+        itemsNames = new ArrayList<>();
+        List<Meal> meals = db.allMeals();
+        boolean counter = true;if (meals != null) {
+            for (int i = 0; i < meals.size(); i++) {
+                if (!meals.get(i).getUploader().equals(userEmail) && meals.get(i).getDelivery().equals("None Assigned")) {
+                    System.out.println(meals.get(i).toString());
+                    itemsNames.add(meals.get(i).toString());
+                    counter = false;
+                }
+            }
+        }
+        if(counter) {
+            itemsNames.add("No Tasks available at this time. Check back later");
+        }
+
+        ListView list = findViewById(R.id.availableMeals);
+        list.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, itemsNames));
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                String[] str = itemsNames.get(position).split("\n");
+                String mealID = str[0].split(": ")[1];
+                selectedMeal = db.getMeal(mealID);
+                String prompt = null;
+                if(selectedMeal.getOTP()!=-1) {
+                    prompt = itemsNames.get(position);
+                    taskType = "invalid";
+                }
+                else if(!selectedMeal.getDelivery().equals("None Assigned") && selectedMeal.getOTP()==-1) {
+                    prompt = itemsNames.get(position);
+                    taskType = "get";
+                }
+                else if(selectedMeal.getDelivery().equals("None Assigned")) {
+                    prompt = itemsNames.get(position);
+                    taskType = "deliver";
+                }
+
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.deliveryTasks), prompt, Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
+    }
+
+    public void getNearby(View view) {
+        itemsNames = new ArrayList<>();
+        List<Meal> meals = db.allMeals();
+        boolean counter = true;
+
+        if (meals != null) {
+            for (int i = 0; i < meals.size(); i++) {
+                if (!meals.get(i).getUploader().equals(userEmail) && meals.get(i).getFromLocation().equalsIgnoreCase(db.getUser(userEmail).getCommunity())) {
+                    itemsNames.add(meals.get(i).toString());
+                    System.out.println(meals.get(i).toString());
+                    counter = false;
+                }
+            }
+        }
+        if(counter) {
+            itemsNames.add("No Tasks available at this time. Check back later");
+        }
+
+
+        ListView list = findViewById(R.id.availableMeals);
+        list.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, itemsNames));
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                String[] str = itemsNames.get(position).split("\n");
+                String mealID = str[0].split(": ")[1];
+                selectedMeal = db.getMeal(mealID);
+                String prompt = null;
+                if(selectedMeal.getOTP()!=-1) {
+                    prompt = itemsNames.get(position);
+                    taskType = "invalid";
+                }
+                else if(!selectedMeal.getDelivery().equals("None Assigned") && selectedMeal.getOTP()==-1) {
+                    prompt = itemsNames.get(position);
+                    taskType = "get";
+                }
+                else if(selectedMeal.getDelivery().equals("None Assigned")) {
+                    prompt = itemsNames.get(position);
+                    taskType = "deliver";
+                }
+
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.deliveryTasks), prompt, Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
+    }
 
     // Called when user finishes creating task
     public void taskCreated(View view) {
@@ -168,7 +218,7 @@ public class UserTask extends AppCompatActivity {
             // generate otp and send to user. Also update otp in database
             int otp = ThreadLocalRandom.current().nextInt(10000, 99999 + 1);
             // db.deleteMeal(selectedMeal);
-            Switch aSwitch = findViewById(R.id.regularSwitch);
+            Switch aSwitch = findViewById(R.id.regularDelivery);
             boolean checked = aSwitch.isChecked();
             String frequency;
             if(checked)
@@ -178,10 +228,18 @@ public class UserTask extends AppCompatActivity {
             String toLocation = db.getUser(userEmail).getCommunity();
             System.out.println(selectedMeal.getFromLocation() + " - " + toLocation);
             Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), toLocation, selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp, frequency, 0);
-            float cost = getCost(meal);
+            float cost = -1;
+            cost = getCost(meal);
+            while(cost<0);
             meal.setCost(cost);
             db.updateMeal(meal);
+
             // send delivery information email to user
+            String orderReceipt;
+            orderReceipt = "ID: " + selectedMeal.getId() + "\n" + "Recipe: " + selectedMeal.getRecipe() + "\n" + "Size: " + selectedMeal.getPacket() + "\n" +"Deliver to: " + toLocation + "\n" + "OTP: " + otp;
+
+            bundle.putString("sendEmail", "sendEmail");
+            bundle.putString("receipt", orderReceipt);
             intent.putExtras(bundle);
             startActivity(intent);
         }
@@ -198,20 +256,36 @@ public class UserTask extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        }
+        return false;
+    }
+
     public float getCost(Meal meal) {
         String toLocation = meal.getToLocation();
         String fromLocation = meal.getFromLocation();
 
         GeocodingLocation toLocationAddress = new GeocodingLocation();
         GeocodingLocation fromLocationAddress = new GeocodingLocation();
-        toLocationAddress.getAddressFromLocation(toLocation,
-                getApplicationContext(), new GeocoderHandler());
+        while(buffer==null) {
+            toLocationAddress.getAddressFromLocation(toLocation,
+                    getApplicationContext(), new GeocoderHandler());
+        }
         System.out.println(buffer);
         toLocation = buffer;
-        fromLocationAddress.getAddressFromLocation(fromLocation,
-                getApplicationContext(), new GeocoderHandler());
+        buffer = null;
+        while(buffer==null) {
+            fromLocationAddress.getAddressFromLocation(fromLocation,
+                    getApplicationContext(), new GeocoderHandler());
+        }
         fromLocation = buffer;
         System.out.println(buffer);
+        buffer = null;
         Location toLoc = new Location("Receiver");
         toLoc.setLatitude(Double.parseDouble(toLocation.split(":")[0]));
         toLoc.setLongitude(Double.parseDouble(toLocation.split(":")[1]));
@@ -221,17 +295,18 @@ public class UserTask extends AppCompatActivity {
         fromLoc.setLongitude(Double.parseDouble(fromLocation.split(":")[1]));
 
         float distance = fromLoc.distanceTo(toLoc);
+//        float distance = 125;
 
         float cost = 0;
 
-        cost += distance;
+        cost += distance*1.5;
 
         if(meal.getPacket().equals("Small"))
-            cost += 1;
+            cost *= 1;
         else if(meal.getPacket().equals("Medium"))
-            cost += 2;
+            cost *= 1.25;
         else
-            cost += 3;
+            cost *= 1.5;
 
         if(meal.getFrequency().equals("Regular"))
             cost -= 0.2*cost;

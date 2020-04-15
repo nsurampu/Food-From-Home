@@ -25,6 +25,7 @@ public class UserRegistration extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString("email", email);
         bundle.putString("pass", pass);
+        bundle.putString("page", "register");
         intent.putExtras(bundle);
         startActivityForResult(intent, 9000);
     }

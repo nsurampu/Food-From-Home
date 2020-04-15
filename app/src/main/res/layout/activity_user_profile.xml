@@ -62,17 +62,18 @@
 
     <EditText
         android:id="@+id/communityRegister"
-        android:layout_width="284dp"
-        android:layout_height="48dp"
+        android:layout_width="213dp"
+        android:layout_height="46dp"
         android:ems="10"
         android:hint="@string/profile_community"
+        android:importantForAutofill="no"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.313"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.615"
-        android:importantForAutofill="no" />
+        app:layout_constraintVertical_bias="0.618" />
 
     <Button
         android:id="@+id/profileButton"
@@ -86,4 +87,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.815" />
+
+    <Button
+        android:id="@+id/detectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="detectLocation"
+        android:text="@string/detect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.617" />
 </android.support.constraint.ConstraintLayout>

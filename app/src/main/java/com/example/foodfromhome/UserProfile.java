@@ -1,24 +1,38 @@
 package com.example.foodfromhome;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class UserProfile extends AppCompatActivity {
 
     private SQLiteDatabaseHandler db;
+    private FusedLocationProviderClient fusedLocationClient;
+    public String address;
+    EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
         db = new SQLiteDatabaseHandler(this);
         Bundle bundle = getIntent().getExtras();
-        if(bundle.getString("page")==null) {
+        if(bundle.getString("page").equals("home")) {
             String email = bundle.getString("email");
-            EditText editText;
             editText = findViewById(R.id.nameRegister);
             editText.setText(db.getUser(email).getName());
             editText = findViewById(R.id.phoneRegister);
@@ -28,12 +42,35 @@ public class UserProfile extends AppCompatActivity {
         }
     }
 
+    // Called to detect location
+    public void detectLocation(View view) {
+        editText = findViewById(R.id.communityRegister);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        List<Address> addresses;
+                        if (location != null) {
+                            System.out.println(location);
+                            Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+                            try {
+                                addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                if (addresses.size() > 0)
+                                    address = addresses.get(0).getThoroughfare();
+                            } catch (IOException e) {
+                                System.out.println(e);
+                            }
+                        }
+                    }
+                });
+        editText.setText(address);
+    }
+
     // Called when user finishes profile
     public void finishProfile(View view) {
         String callingCLass = getCallingActivity().getClassName();
         System.out.println(callingCLass);
         if(callingCLass.equals("com.example.foodfromhome.UserRegistration")) {
-            EditText editText;
             editText = findViewById(R.id.nameRegister);
             String name = editText.getText().toString();
             editText = findViewById(R.id.phoneRegister);
@@ -49,7 +86,6 @@ public class UserProfile extends AppCompatActivity {
             startActivity(intent);
         }
         else {
-            EditText editText;
             editText = findViewById(R.id.nameRegister);
             String name = editText.getText().toString();
             editText = findViewById(R.id.phoneRegister);

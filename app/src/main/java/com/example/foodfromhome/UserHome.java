@@ -2,6 +2,7 @@ package com.example.foodfromhome;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +10,21 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Properties;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 public class UserHome extends AppCompatActivity {
 
@@ -20,6 +36,9 @@ public class UserHome extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home);
         db = new SQLiteDatabaseHandler(this);
@@ -45,6 +64,38 @@ public class UserHome extends AppCompatActivity {
                     meal = meals.get(i);
                     break;
                 }
+            }
+        }
+
+        if(!(bundle.getString("sendEmail")==null)) {
+            final String username = "foodfromhome20@gmail.com";
+            final String password = "app@oop2020";
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "587");
+
+            Session session = Session.getInstance(props,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(username, password);
+                        }
+                    });
+            try {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress("foodfromhome20@gmail.com"));
+                message.setRecipients(Message.RecipientType.TO,
+                        InternetAddress.parse(meal.getReceiver()));
+                message.setSubject("Food From Home: Order Receipt");
+                message.setText("Your Order Summary: \n\n" + bundle.getString("receipt"));
+
+                Transport.send(message);
+
+                System.out.println("Done");
+
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -78,6 +129,9 @@ public class UserHome extends AppCompatActivity {
                 deliveryContact = db.getUser(deliveryEmail).getMobile();
                 sampleTextView = findViewById(R.id.deliveryContact);
                 sampleTextView.setText(deliveryContact);
+//                sampleTextView = findViewById(R.id.otpText);
+//                sampleTextView.setText(meal.getOTP());
+//                sampleTextView.setEnabled(false);
             }
 
             sampleTextView = findViewById(R.id.recipeText);
@@ -116,6 +170,8 @@ public class UserHome extends AppCompatActivity {
             db.deleteMeal(meal);
             Snackbar prompt = Snackbar.make(findViewById(R.id.homePage), "Meal delivery successful", Snackbar.LENGTH_LONG);
             prompt.show();
+            finish();
+            startActivity(getIntent());
         }
         else {
             Snackbar warning = Snackbar.make(findViewById(R.id.homePage), "Incorrect OTP", Snackbar.LENGTH_LONG);
@@ -142,6 +198,7 @@ public class UserHome extends AppCompatActivity {
     // Called when user wants to edit profile
     public void editProfile(View view) {
         Bundle bundle = getIntent().getExtras();
+        bundle.putString("page", "home");
         Intent intent = new Intent(this, UserProfile.class);
         intent.putExtras(bundle);
         startActivityForResult(intent, 8050);
