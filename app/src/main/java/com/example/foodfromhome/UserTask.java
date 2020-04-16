@@ -1,12 +1,15 @@
 package com.example.foodfromhome;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,11 +30,19 @@ public class UserTask extends AppCompatActivity {
     Meal selectedMeal;
     String userEmail;
     String taskType;
-
     String buffer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        regular = getSharedPreferences("freq", MODE_PRIVATE);
+//        Switch aSwitch = findViewById(R.id.regularDelivery);
+//        if(regular.getString("freq", null)!=null) {
+//            if(regular.getString("freq", null).equals("true"))
+//                aSwitch.setChecked(true);
+//            else
+//                aSwitch.setChecked(false);
+//        }
+
         itemsNames = new ArrayList<>();
         buffer = null;
         super.onCreate(savedInstanceState);
@@ -49,11 +60,37 @@ public class UserTask extends AppCompatActivity {
                 android.R.layout.simple_list_item_1, android.R.id.text1, itemsNames));
     }
 
+    public void setFrequency(View view) {
+//        regular = getSharedPreferences("freq", MODE_PRIVATE);
+//        regularEdit = regular.edit();
+        Switch aSwitch = findViewById(R.id.regularDelivery);
+        String freq;
+        if(aSwitch.isChecked())
+            freq = "true";
+        else
+            freq = "false";
+//        regularEdit.putString("freq", freq);
+//        regularEdit.commit();
+    }
+
+    public void removeRegulars(View view) {
+        List<Meal> meals = db.allMeals();
+
+        if(meals!=null) {
+            for (int i=0; i < meals.size(); i++) {
+                if (meals.get(i).getReceiver().equals(userEmail) && !meals.get(i).getFrequency().equals("Demand"))
+                    db.deleteMeal(meals.get(i));
+            }
+        }
+    }
+
     public void getMeals(View view) {
         findViewById(R.id.regularDelivery).setVisibility(View.VISIBLE);
+        findViewById(R.id.removeRegs).setVisibility(View.VISIBLE);
         itemsNames = new ArrayList<>();
         List<Meal> meals = db.allMeals();
-        boolean counter = true;if (meals != null) {
+        boolean counter = true;
+        if (meals != null) {
             for (int i = 0; i < meals.size(); i++) {
                 if (!meals.get(i).getUploader().equals(userEmail) && !meals.get(i).getDelivery().equals("None Assigned") && meals.get(i).getOTP()==-1) {
                     System.out.println(meals.get(i).toString());
@@ -100,11 +137,12 @@ public class UserTask extends AppCompatActivity {
 
     public void getDeliveries(View view) {
         findViewById(R.id.regularDelivery).setVisibility(View.INVISIBLE);
+        findViewById(R.id.removeRegs).setVisibility(View.INVISIBLE);
         itemsNames = new ArrayList<>();
         List<Meal> meals = db.allMeals();
         boolean counter = true;if (meals != null) {
             for (int i = 0; i < meals.size(); i++) {
-                if (!meals.get(i).getUploader().equals(userEmail) && meals.get(i).getDelivery().equals("None Assigned")) {
+                if (!meals.get(i).getUploader().equals(userEmail) && meals.get(i).getDelivery().equals("None Assigned") && meals.get(i).getFrequency().equals("Demand")) {
                     System.out.println(meals.get(i).toString());
                     itemsNames.add(meals.get(i).toString());
                     counter = false;
@@ -222,15 +260,16 @@ public class UserTask extends AppCompatActivity {
             boolean checked = aSwitch.isChecked();
             String frequency;
             if(checked)
-                frequency = "Regular";
+                frequency = "24";
             else
                 frequency = "Demand";
             String toLocation = db.getUser(userEmail).getCommunity();
             System.out.println(selectedMeal.getFromLocation() + " - " + toLocation);
-            Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), toLocation, selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp, frequency, 0);
-            float cost = -1;
-            cost = getCost(meal);
-            while(cost<0);
+            Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), toLocation, selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp, frequency, -1);
+            float cost=-1;
+//            while(cost<0)
+//                cost = getCost(meal);;
+            cost = 123;
             meal.setCost(cost);
             db.updateMeal(meal);
 
@@ -307,9 +346,6 @@ public class UserTask extends AppCompatActivity {
             cost *= 1.25;
         else
             cost *= 1.5;
-
-        if(meal.getFrequency().equals("Regular"))
-            cost -= 0.2*cost;
 
         return cost;
     }

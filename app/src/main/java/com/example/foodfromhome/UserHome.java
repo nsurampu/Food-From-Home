@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -18,13 +19,16 @@ import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
+import javax.mail.PasswordAuthentication;c
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 public class UserHome extends AppCompatActivity {
 
@@ -33,9 +37,24 @@ public class UserHome extends AppCompatActivity {
     SharedPreferences.Editor editorEmail;
     boolean isTask, isDeliver;
     Meal meal;
+    Bundle bundle;
+    SharedPreferences wkManager;
+    SharedPreferences.Editor wkManagerStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        wkManager = getSharedPreferences("status", MODE_PRIVATE);
+        wkManagerStatus = wkManager.edit();
+        System.out.println(wkManager.getString("status", null));
+        if(wkManager.getString("status", null)==null) {
+            PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(RegularWork.class, 15, TimeUnit.MINUTES)
+                    .build();
+            WorkManager.getInstance().enqueue(periodicWorkRequest);
+            wkManagerStatus.putString("status", "running");
+            wkManagerStatus.commit();
+        }
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -48,7 +67,7 @@ public class UserHome extends AppCompatActivity {
         isDeliver = false;
         meal = null;
 
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         String email = bundle.getString("email");
         TextView textView = findViewById(R.id.welcome);
         textView.setText("Welcome " + db.getUser(email).getName() + "!");
@@ -100,9 +119,6 @@ public class UserHome extends AppCompatActivity {
         }
 
         if(isTask) {
-            findViewById(R.id.newTask).setEnabled(false);
-            findViewById(R.id.newMeal).setEnabled(false);
-
             TextView sampleTextView;
             String deliveryEmail, deliveryContact;
 
@@ -112,6 +128,8 @@ public class UserHome extends AppCompatActivity {
                 findViewById(R.id.otpView).setVisibility(View.VISIBLE);
                 sampleTextView = findViewById(R.id.deliveryText);
                 deliveryEmail = meal.getReceiver();
+                findViewById(R.id.newTask).setEnabled(false);
+                findViewById(R.id.newMeal).setEnabled(false);
                 if(!meal.getReceiver().equals("None Assigned")) {
                     sampleTextView.setText(db.getUser(deliveryEmail).getName());
                     deliveryContact = db.getUser(deliveryEmail).getMobile();
@@ -123,15 +141,20 @@ public class UserHome extends AppCompatActivity {
                 findViewById(R.id.taskFinish).setVisibility(View.INVISIBLE);
                 findViewById(R.id.otpText).setVisibility(View.INVISIBLE);
                 findViewById(R.id.otpView).setVisibility(View.INVISIBLE);
-                sampleTextView = findViewById(R.id.deliveryText);
-                deliveryEmail = meal.getDelivery();
-                sampleTextView.setText(db.getUser(deliveryEmail).getName());
-                deliveryContact = db.getUser(deliveryEmail).getMobile();
-                sampleTextView = findViewById(R.id.deliveryContact);
-                sampleTextView.setText(deliveryContact);
-//                sampleTextView = findViewById(R.id.otpText);
-//                sampleTextView.setText(meal.getOTP());
-//                sampleTextView.setEnabled(false);
+                if(meal.getOTP()==-1) {
+                    findViewById(R.id.newTask).setEnabled(true);
+                    findViewById(R.id.newMeal).setEnabled(true);
+                }
+                else {
+                    findViewById(R.id.newTask).setEnabled(false);
+                    findViewById(R.id.newMeal).setEnabled(false);
+                    sampleTextView = findViewById(R.id.deliveryText);
+                    deliveryEmail = meal.getDelivery();
+                    sampleTextView.setText(db.getUser(deliveryEmail).getName());
+                    deliveryContact = db.getUser(deliveryEmail).getMobile();
+                    sampleTextView = findViewById(R.id.deliveryContact);
+                    sampleTextView.setText(deliveryContact);
+                }
             }
 
             sampleTextView = findViewById(R.id.recipeText);
@@ -163,11 +186,17 @@ public class UserHome extends AppCompatActivity {
 
     // Called to finish task using OTP
     public void taskOTP(View view) {
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         TextView textView = findViewById(R.id.otpText);
         int userOtp = Integer.parseInt(textView.getText().toString());
         if(meal.getOTP()==userOtp) {
-            db.deleteMeal(meal);
+            if(meal.getFrequency().equals("Demand"))
+                db.deleteMeal(meal);
+            else {
+                meal.setDelivery("None Assigned");
+                meal.setOTP(-1);
+                db.updateMeal(meal);
+            }
             Snackbar prompt = Snackbar.make(findViewById(R.id.homePage), "Meal delivery successful", Snackbar.LENGTH_LONG);
             prompt.show();
             finish();
@@ -181,7 +210,7 @@ public class UserHome extends AppCompatActivity {
 
     // Called when user starts new delivery task
     public void deliveryTask(View view) {
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         Intent intent = new Intent(this, UserTask.class);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -189,7 +218,7 @@ public class UserHome extends AppCompatActivity {
 
     //Called when user wants to upload meal
     public void mealUpload(View view) {
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         Intent intent = new Intent(this, UserMeal.class);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -197,7 +226,7 @@ public class UserHome extends AppCompatActivity {
 
     // Called when user wants to edit profile
     public void editProfile(View view) {
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         bundle.putString("page", "home");
         Intent intent = new Intent(this, UserProfile.class);
         intent.putExtras(bundle);

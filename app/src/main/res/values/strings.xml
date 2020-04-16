@@ -46,4 +46,5 @@
     <string name="or">OR</string>
     <string name="detect">Detect</string>
     <string name="nearby">Find Nearby</string>
+    <string name="removeRegs">Remove Regulars</string>
 </resources>

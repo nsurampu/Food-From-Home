@@ -17,8 +17,11 @@ public class UserMeal extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getIntent().getExtras();
         setContentView(R.layout.activity_user_meal);
         db = new SQLiteDatabaseHandler(this);
+        EditText editText = findViewById(R.id.mealCommunity);
+        editText.setText(db.getUser(bundle.getString("email")).getCommunity());
     }
 
     // Called when user finishes uploading meal
@@ -40,7 +43,7 @@ public class UserMeal extends AppCompatActivity {
         int otp = -1;
         String frequency = "Demand";
         String id = UUID.randomUUID().toString();
-        Meal meal = new Meal(id, recipe, fromLocation, toLocation, packet, bundle.getString("email"), delivery, receiver ,otp, frequency, 0);
+        Meal meal = new Meal(id, recipe, fromLocation, toLocation, packet, bundle.getString("email"), delivery, receiver ,otp, frequency, -1);
         db.addMeal(meal);
         Intent intent = new Intent(this, UserHome.class);
         intent.putExtras(bundle);
