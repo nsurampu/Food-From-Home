@@ -1,5 +1,22 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>UserTask</h1>
+ * This class implements the activity for creating a
+ * delivery task. A delivery task can be used to refer
+ * to either delivering a meal or ordering a meal. The
+ * various details like OTP, location and size based
+ * cost calculation etc. are performed here. This activity
+ * also uses the Google APIs for distance tracking. Enter the
+ * API key value in the public KEY field for using the application
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +26,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,11 +37,20 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class UserTask extends AppCompatActivity {
+
+    String KEY = "AIzaSyC0E4xnQWncCl-jUyXVDscJ5Z2M2myIRGs";
 
     private SQLiteDatabaseHandler db;
     List<String> itemsNames;
@@ -238,6 +265,8 @@ public class UserTask extends AppCompatActivity {
 
     // Called when user finishes creating task
     public void taskCreated(View view) {
+        float cost = -1;
+
         Bundle bundle = new Bundle();
         bundle.putString("email", userEmail);
         Intent intent = new Intent(this, UserHome.class);
@@ -255,7 +284,6 @@ public class UserTask extends AppCompatActivity {
         else if(taskType.equals("get")){
             // generate otp and send to user. Also update otp in database
             int otp = ThreadLocalRandom.current().nextInt(10000, 99999 + 1);
-            // db.deleteMeal(selectedMeal);
             Switch aSwitch = findViewById(R.id.regularDelivery);
             boolean checked = aSwitch.isChecked();
             String frequency;
@@ -266,16 +294,16 @@ public class UserTask extends AppCompatActivity {
             String toLocation = db.getUser(userEmail).getCommunity();
             System.out.println(selectedMeal.getFromLocation() + " - " + toLocation);
             Meal meal = new Meal(selectedMeal.getId(), selectedMeal.getRecipe(), selectedMeal.getFromLocation(), toLocation, selectedMeal.getPacket(), selectedMeal.getUploader(), selectedMeal.getDelivery(), userEmail, otp, frequency, -1);
-            float cost=-1;
-//            while(cost<0)
-//                cost = getCost(meal);;
-            cost = 123;
+            cost = getCost(meal);
             meal.setCost(cost);
             db.updateMeal(meal);
+            History history = new History(userEmail, selectedMeal.getRecipe(), cost);
+            history.setCost(cost);
+            db.addHistory(history);
 
             // send delivery information email to user
             String orderReceipt;
-            orderReceipt = "ID: " + selectedMeal.getId() + "\n" + "Recipe: " + selectedMeal.getRecipe() + "\n" + "Size: " + selectedMeal.getPacket() + "\n" +"Deliver to: " + toLocation + "\n" + "OTP: " + otp;
+            orderReceipt = "ID: " + selectedMeal.getId() + "\nRecipe: " + selectedMeal.getRecipe() + "\nSize: " + selectedMeal.getPacket() + "\nDelivery Executive: " + db.getUser(selectedMeal.getDelivery()).getName() + "\nDelivery Executive Contact: " + db.getUser(selectedMeal.getDelivery()).getMobile() +"\nDeliver to: " + toLocation + "\nOTP: " + otp;
 
             bundle.putString("sendEmail", "sendEmail");
             bundle.putString("receipt", orderReceipt);
@@ -309,36 +337,15 @@ public class UserTask extends AppCompatActivity {
         String toLocation = meal.getToLocation();
         String fromLocation = meal.getFromLocation();
 
-        GeocodingLocation toLocationAddress = new GeocodingLocation();
-        GeocodingLocation fromLocationAddress = new GeocodingLocation();
-        while(buffer==null) {
-            toLocationAddress.getAddressFromLocation(toLocation,
-                    getApplicationContext(), new GeocoderHandler());
-        }
-        System.out.println(buffer);
-        toLocation = buffer;
-        buffer = null;
-        while(buffer==null) {
-            fromLocationAddress.getAddressFromLocation(fromLocation,
-                    getApplicationContext(), new GeocoderHandler());
-        }
-        fromLocation = buffer;
-        System.out.println(buffer);
-        buffer = null;
-        Location toLoc = new Location("Receiver");
-        toLoc.setLatitude(Double.parseDouble(toLocation.split(":")[0]));
-        toLoc.setLongitude(Double.parseDouble(toLocation.split(":")[1]));
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
-        Location fromLoc = new Location("Provider");
-        fromLoc.setLatitude(Double.parseDouble(fromLocation.split(":")[0]));
-        fromLoc.setLongitude(Double.parseDouble(fromLocation.split(":")[1]));
-
-        float distance = fromLoc.distanceTo(toLoc);
-//        float distance = 125;
+        String someText = getDistance("https://maps.googleapis.com/maps/api/directions/json?key=" + KEY + "&origin=" + fromLocation +"&destination=" + toLocation +"&sensor=false");
+        float distance = Float.parseFloat(someText.split(": ")[1].split(",")[0].replaceAll("^\"|\"$", "").split(" ")[0]);
 
         float cost = 0;
 
-        cost += distance*1.5;
+        cost += distance*30;
 
         if(meal.getPacket().equals("Small"))
             cost *= 1;
@@ -350,19 +357,49 @@ public class UserTask extends AppCompatActivity {
         return cost;
     }
 
-    private class GeocoderHandler extends Handler {
+    public String getDistance(String... params) {
 
-        @Override
-        public void handleMessage(Message message) {
-            String locationAddress = null;
-            switch(message.what) {
-                case 1:
-                    Bundle bundle = message.getData();
-                    locationAddress = bundle.getString("address");
-                    System.out.println(locationAddress);
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
+
+        try {
+            URL url = new URL(params[0]);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+
+            InputStream stream = connection.getInputStream();
+
+            reader = new BufferedReader(new InputStreamReader(stream));
+
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+
+            while ((line = reader.readLine()) != null) {
+                if(line.contains("km")) {
+                    buffer.append(line + "-");
                     break;
+                }
             }
-            buffer = locationAddress;
+
+            return buffer.toString();
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        return null;
     }
 }

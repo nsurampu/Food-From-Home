@@ -3,40 +3,48 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/homePage"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserHome">
 
     <Button
         android:id="@+id/newTask"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="160dp"
         android:layout_height="48dp"
+        android:gravity="center_vertical|right"
         android:onClick="deliveryTask"
         android:text="@string/new_task"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.063"
+        app:layout_constraintHorizontal_bias="0.936"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.904" />
+        app:layout_constraintVertical_bias="0.196" />
 
     <Button
         android:id="@+id/newMeal"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="166dp"
         android:layout_height="49dp"
+        android:gravity="center_vertical|right"
         android:onClick="mealUpload"
         android:text="@string/new_meal"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.938"
+        app:layout_constraintHorizontal_bias="0.934"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.904" />
+        app:layout_constraintVertical_bias="0.284" />
 
     <Button
         android:id="@+id/signOut"
-        android:layout_width="383dp"
-        android:layout_height="44dp"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="318dp"
+        android:layout_height="42dp"
         android:onClick="signOut"
         android:text="@string/sign_out"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,6 +54,7 @@
         app:layout_constraintVertical_bias="0.989" />
 
     <Button
+        style="?android:attr/borderlessButtonStyle"
         android:id="@+id/taskFinish"
         android:layout_width="80dp"
         android:layout_height="39dp"
@@ -81,10 +90,10 @@
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.055"
+        app:layout_constraintHorizontal_bias="0.062"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.049" />
+        app:layout_constraintVertical_bias="0.023" />
 
     <TextView
         android:id="@+id/textView7"
@@ -97,7 +106,7 @@
         app:layout_constraintHorizontal_bias="0.071"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.151" />
+        app:layout_constraintVertical_bias="0.191" />
 
     <TextView
         android:id="@+id/textView9"
@@ -226,16 +235,50 @@
         app:layout_constraintVertical_bias="0.532" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/profileButton"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical|right"
         android:onClick="editProfile"
         android:text="@string/profile_user"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.952"
+        app:layout_constraintHorizontal_bias="0.945"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.049" />
+        app:layout_constraintVertical_bias="0.111" />
+
+    <Button
+        android:gravity="center_vertical|right"
+        android:id="@+id/menuButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="menuAccess"
+        android:text="@string/menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.023" />
+
+    <Button
+        android:id="@+id/historyButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|right"
+        android:onClick="getHistory"
+        android:text="@string/history"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.371" />
 
 </android.support.constraint.ConstraintLayout>

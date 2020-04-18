@@ -7,6 +7,7 @@
     tools:context=".UserMeal">
 
     <Button
+        style="?android:attr/borderlessButtonStyle"
         android:id="@+id/mealUpload"
         android:layout_width="244dp"
         android:layout_height="59dp"

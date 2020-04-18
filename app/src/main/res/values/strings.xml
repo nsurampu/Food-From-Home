@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Food From Home</string>
+    <string name="app_slogon">Food for You, with Love</string>
     <string name="login_email">Email (Regular and FB Login)</string>
     <string name="login_password">Password</string>
     <string name="sample_email">abc@gmail.com</string>
@@ -38,7 +39,7 @@
     <string name="location">Location:</string>
     <string name="eta">ETA:</string>
     <string name="otp">OTP:</string>
-    <string name="cost">Cost:</string>
+    <string name="cost">Cost(Rs):</string>
     <string name="regular">Regular Delivery</string>
     <string name="finish">Finish</string>
     <string name="facebook_app_id">174926096915509</string>
@@ -47,4 +48,8 @@
     <string name="detect">Detect</string>
     <string name="nearby">Find Nearby</string>
     <string name="removeRegs">Remove Regulars</string>
+    <string name="loginInstruction">Email mandatory for Facebook login</string>
+    <string name="menu">Menu</string>
+    <string name="history">History</string>
+    <string name="history_user">User History</string>
 </resources>

@@ -1,5 +1,17 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>User</h1>
+ * This class implements the User object, used to
+ * make entries into the database for keeping track of user
+ * credentials.
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
 public class User {
 
     private String email;

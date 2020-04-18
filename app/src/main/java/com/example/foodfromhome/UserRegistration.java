@@ -1,5 +1,17 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>UserRegistration</h1>
+ * This class implements the activity for user registration
+ * at the time of first time account creation
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
+
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

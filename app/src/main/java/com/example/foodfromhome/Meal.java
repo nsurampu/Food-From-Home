@@ -1,5 +1,18 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>Meal</h1>
+ * This class implements the Meal object, used to
+ * make entries into the database for tracking meal
+ * to be delivered or received by users. Entries are
+ * made when a user uploads a meal
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
 public class Meal {
 
     private String id;

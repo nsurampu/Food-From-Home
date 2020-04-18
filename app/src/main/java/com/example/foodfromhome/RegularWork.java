@@ -1,5 +1,16 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>RegularWork</h1>
+ * This class implements a backend task for keeping
+ * track of regular deliveries.
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
@@ -70,7 +81,7 @@ public class RegularWork extends Worker{
                         orderReceipt = "ID: " + selectedMeal.getId() + "\n" + "Recipe: " + selectedMeal.getRecipe() + "\n" + "Size: " + selectedMeal.getPacket() + "\n" +"Deliver to: " + selectedMeal.getToLocation() + "\n" + "OTP: " + otp;
 
                         final String username = "foodfromhome20@gmail.com";
-                        final String password = "app@oop2020";
+                        final String password = "foodfromhome@oop2020";
                         Properties props = new Properties();
                         props.put("mail.smtp.auth", "true");
                         props.put("mail.smtp.starttls.enable", "true");

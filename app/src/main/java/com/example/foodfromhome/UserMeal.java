@@ -1,5 +1,17 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>UserMeal</h1>
+ * This class implements the activity for uploading
+ * a meal by the user
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
+
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

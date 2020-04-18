@@ -1,5 +1,18 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>UserProfile</h1>
+ * This class implements the activity for displaying
+ * and editing the profile of a user. Includes user's
+ * name, contact number and address
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
+
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;

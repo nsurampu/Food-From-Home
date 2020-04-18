@@ -1,5 +1,17 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>FOOD FROM HOME</h1>
+ * This MainActivity class is the entry point of the app
+ * and provides a simple login screen. User can either choose
+ * to make a new account using the in-app register or Facebook.
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;

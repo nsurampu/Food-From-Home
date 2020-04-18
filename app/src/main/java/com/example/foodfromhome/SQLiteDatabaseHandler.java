@@ -1,5 +1,18 @@
 package com.example.foodfromhome;
 
+/**
+ * <h1>SQLiteDataBaseHandler</h1>
+ * This class implements a SQLite database handler
+ * fpr creating, inserting into, updating and
+ * retrieving from tables for User credentials,
+ * Meals and User history
+ * <p>
+ *
+ * @author  Naren Surampudi
+ * @version 1.0
+ * @since   2020-3-3
+ */
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,6 +51,12 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
     private static final String[] COLUMNS_MEALS = { KEY_ID_MEALS, KEY_RECIPE_MEALS, KEY_FROM_MEALS, KEY_TO_MEALS, KEY_PACKET_MEALS,
             KEY_UPLOADER_MEALS, KEY_DELIVERY_MEALS, KEY_RECEIVER_MEALS, KEY_OTP, KEY_FREQUENCY, KEY_COST };
 
+    private static final String TABLE_HISTORY = "HistoryData";
+    private static final String KEY_USER = "email";
+    private static final String KEY_RECIPE = "recipe";
+    private static final String KEY_HIST_COST = "cost";
+    private static final String[] COLUMNS_HISTORY = { KEY_USER, KEY_RECIPE, KEY_HIST_COST };
+
     public SQLiteDatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -55,8 +74,12 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
                 + "uploader TEXT, "
                 + "delivery TEXT, " + "receiver TEXT, " + "otp INTEGER, " + "frequency TEXT, " + "cost TEXT )";
 
+        String CREATION_TABLE_HISTORY = "CREATE TABLE  HistoryData( "
+                + "email TEXT PRIMARY KEY, " + "recipe TEXT, " + "cost TEXT )";
+
         db.execSQL(CREATION_TABLE_USERS);
         db.execSQL(CREATION_TABLE_MEALS);
+        db.execSQL(CREATION_TABLE_HISTORY);
 
         ContentValues content;
         content = new ContentValues();
@@ -89,6 +112,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         // you can implement here migration process
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
         this.onCreate(db);
     }
 
@@ -144,6 +168,39 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         }
 
         return users;
+    }
+
+    public void addHistory(History history) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER, history.getEmail());
+        values.put(KEY_RECIPE, history.getRecipe());
+        values.put(KEY_HIST_COST, history.getCost());
+
+        // insert
+        db.insert(TABLE_HISTORY,null, values);
+        db.close();
+    }
+
+    public List<History> allHistory() {
+
+        List<History> histories = new LinkedList<History>();
+        String query = "SELECT  * FROM " + TABLE_HISTORY;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        History history = null;
+
+        if (cursor.moveToFirst()) {
+            do {
+                history = new History();
+                history.setEmail(cursor.getString(0));
+                history.setRecipe(cursor.getString(1));
+                history.setCost(Float.parseFloat(cursor.getString(2)));
+                histories.add(history);
+            } while (cursor.moveToNext());
+        }
+
+        return histories;
     }
 
     public void addUser(User user) {
