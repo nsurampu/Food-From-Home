@@ -50,7 +50,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class UserTask extends AppCompatActivity {
 
-    String KEY = "AIzaSyC0E4xnQWncCl-jUyXVDscJ5Z2M2myIRGs";
+    String KEY = "";   // removed for privacy and security
 
     private SQLiteDatabaseHandler db;
     List<String> itemsNames;
