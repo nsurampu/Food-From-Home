@@ -130,7 +130,7 @@ public class UserHome extends AppCompatActivity {
 
         if(!(bundle.getString("sendEmail")==null)) {
             final String username = "foodfromhome20@gmail.com";
-            final String password = "";   // removed for privacy and security
+            final String password = "foodfromhome@oop2020";
             Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.starttls.enable", "true");

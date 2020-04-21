@@ -81,7 +81,7 @@ public class RegularWork extends Worker{
                         orderReceipt = "ID: " + selectedMeal.getId() + "\n" + "Recipe: " + selectedMeal.getRecipe() + "\n" + "Size: " + selectedMeal.getPacket() + "\n" +"Deliver to: " + selectedMeal.getToLocation() + "\n" + "OTP: " + otp;
 
                         final String username = "foodfromhome20@gmail.com";
-                        final String password = "";   // removed for privacy and security
+                        final String password = "foodfromhome@oop2020";
                         Properties props = new Properties();
                         props.put("mail.smtp.auth", "true");
                         props.put("mail.smtp.starttls.enable", "true");
