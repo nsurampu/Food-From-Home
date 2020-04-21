@@ -32,63 +32,63 @@ The application uses Google API for the calculation of distance, that is subsequ
 
 ***Login Screen***
 <br>
-![Login Screen]()
+![Login Screen](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/login.png)
 <br>
 ***Facebook Login***
 <br>
-![Facebook Login]()
+![Facebook Login](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/fblogin.png)
 <br>
 ***Email Registration and Profile Completion***
 <br>
-![Email Registration]()
-![Profile Completion]()
+![Email Registration](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/register.png)
+![Profile Completion](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/profile.png)
 <br>
 ***Home Screen and Home Screen Menu***
 <br>
-![Home Screen]()
-![Home Screen Menu]()
+![Home Screen](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/home.png)
+![Home Screen Menu](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/homeMenu.png)
 <br>
 ***Complete User Profile***
 <br>
-![Complete User Profile]()
+![Complete User Profile](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/completeProfile.png)
 <br>
 ***Upload Meal***
 <br>
-![Upload Meal]()
+![Upload Meal](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/upload.png)
 <br>
 ***Blank Task Page***
 <br>
-![Blank Task Page]()
+![Blank Task Page](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/taskEntry.png)
 <br>
 ***All meals for making delivery***
 <br>
-![All Meals Delivery]()
+![All Meals Delivery](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/allMeals.png)
 <br>
 ***Nearby Meals***
 <br>
-![Nearby Meals]()
+![Nearby Meals](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/nearMeals.png)
 <br>
 ***Delivery Non-Assigned***
 <br>
-![Delivery Non-Assigned]()
+![Delivery Non-Assigned](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/deliveryNonAssigned.png)
 <br>
 ***Get Meal***
 <br>
-![Get Meal]()
+![Get Meal](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/getMeals.png)
 <br>
 ***Meal Confirmation***
 <br>
-![Meal Confirmation]()
+![Meal Confirmation](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/mealConf.png)
 <br>
 ***Order Confirmation Email***
 <br>
-![Order Confirmation Email]()
+![Order Confirmation Email](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/emailConf.png)
 <br>
 ***Completing a Delivery***
 <br>
-![Completing Delivery]()
+![Completing Delivery](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/deliveryConf.png)
 <br>
 ***Blank History and History after making orders***
 <br>
-![Blank History]()
-![History]()
+![Blank History](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/blacnkHistory.png)
+![History](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/newHistory.png)
