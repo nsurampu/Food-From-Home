@@ -80,31 +80,6 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATION_TABLE_USERS);
         db.execSQL(CREATION_TABLE_MEALS);
         db.execSQL(CREATION_TABLE_HISTORY);
-
-        ContentValues content;
-        content = new ContentValues();
-        content.put(KEY_EMAIL_USERS, "john@gmail.com");
-        content.put(KEY_PASSWORD_USERS, "123");
-        content.put(KEY_NAME_USERS, "John");
-        content.put(KEY_MOBILE_USERS, "9273847586");
-        content.put(KEY_COMMUNITY_USERS, "Aundh");
-        db.insert("UserData", null, content);
-
-        content = new ContentValues();
-        content.put(KEY_EMAIL_USERS, "james@gmail.com");
-        content.put(KEY_PASSWORD_USERS, "123");
-        content.put(KEY_NAME_USERS, "James");
-        content.put(KEY_MOBILE_USERS, "9276847586");
-        content.put(KEY_COMMUNITY_USERS, "Hadapsar");
-        db.insert("UserData", null, content);
-
-        content = new ContentValues();
-        content.put(KEY_EMAIL_USERS, "nsurampu@gmail.com");
-        content.put(KEY_PASSWORD_USERS, "123");
-        content.put(KEY_NAME_USERS, "Naren");
-        content.put(KEY_MOBILE_USERS, "7666616971");
-        content.put(KEY_COMMUNITY_USERS, "Magarpatta City");
-        db.insert("UserData", null, content);
     }
 
     @Override

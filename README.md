@@ -30,6 +30,9 @@ The application uses Google API for the calculation of distance, that is subsequ
 
 ### Screenshots
 
+#### NOTE
+The details shown in the screenshots are only for representational purposes and are completely random to protect privacy.</br></br>
+
 ***Login Screen***
 <br>
 ![Login Screen](https://github.com/nsurampu/Food-From-Home/blob/master/Screenshots/login.png)
