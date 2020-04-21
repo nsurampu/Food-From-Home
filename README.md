@@ -31,7 +31,8 @@ The application uses Google API for the calculation of distance, that is subsequ
 ### Screenshots
 
 #### NOTE
-The details shown in the screenshots are only for representational purposes and are completely random to protect privacy.</br></br>
+The details shown in the screenshots are only for representational purposes and are completely random. Details like locations and contact numbers 
+have been hidden to prevent any un-related privacy intrusion.</br></br>
 
 ***Login Screen***
 <br>
